@@ -7,6 +7,7 @@ Readme for Spimi Interface
 5. Address the server in your browser by localhost:10800/spimi/interface
 
     Available options in the spimi-interface:
+
         sort by following: will find the most frequent words AFTER your query
         and return these words as well as 20 sentences with this constellation
 
