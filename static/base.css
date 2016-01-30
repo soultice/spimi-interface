@@ -1,0 +1,27 @@
+.wmatch{
+ color: blue;
+ }
+
+.qmatch{
+color: green;
+}
+
+table {
+ text-padding: 15px 
+ }
+
+td #td1 {
+ width: '10%';
+ text-align: center;
+ }
+
+td #td2 {
+ width: '20%';
+ text-align: center;
+ text-color: blue;
+ }
+
+th {
+ text-align: center;
+ }
+
