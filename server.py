@@ -6,6 +6,10 @@ import subprocess
 import json
 import re
 
+#TODO configuration via Make
+#TODO implement tree visualisation
+#TODO improve api by passing list of hits instead of html code
+
 app = Flask(__name__)
 Bootstrap(app)
 
@@ -27,7 +31,7 @@ def return_freq_after():
        at the left side of the current query. As well as the sentences
        containing these at the correct position and the frequency
 
-       :returns: nested list of [dict(word, frequency, sent)]
+       :returns: nested list of [dict(word, frequency, sent)]:
        :rtype: json"""
     query = request.args.get('q', '')
     sentences = get_output(query)
@@ -66,6 +70,7 @@ def return_freq_prev():
     """Return the 50 most frequent words and 20 corresponding sentences
        at the left side of the current query. As well as the sentences
        containing these at the correct position and the frequency
+
        :returns: nested list of [dict(word, frequency, sent)]
        :rtype: json"""
     query = request.args.get('q', '')
@@ -101,8 +106,8 @@ def return_freq_prev():
 @app.route('/spimi/api/get_cooc', methods=['GET'])
 def return_cooc():
     """Returns sentences containing query as well as a second word
-       
-       :returns nested list of [dict(word, frequency, sent)]
+
+       :returns nested list of [dict(word, frequency, sent)]:
        """
     query = request.args.get('q', '')
     query, cooc = query.split(';')
@@ -187,9 +192,9 @@ def return_json():
     return jsonify(wordpos)
 
 
-@app.route('/spimi/api/test/', methods=['GET'])
+@app.route('/spimi/api/test', methods=['GET'])
 def parse_search():
-    pass
+    return render_template('interface.html') 
 
 
 @app.route('/spimi/interface')
