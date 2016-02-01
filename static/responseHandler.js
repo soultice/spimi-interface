@@ -72,9 +72,8 @@
     var cont = document.getElementById("container");
     var tb1 = document.createElement("table");
     var prevtable = document.getElementById("freq_table")
+    tb1.setAttribute("class", "freq_table")
     tb1.setAttribute("id", "freq_table")
-    //tb1.style.width = "91%";
-    //tb1.setAttribute("border", "0");
     var thead = document.createElement("thead")
     var titles = ['Frequency', 'Word', 'Sentence'];
     for (var i = 0; i< titles.length; i++){
@@ -90,17 +89,25 @@
         td2.setAttribute("id", "td2")
         var td3 = document.createElement('td');
         td3.setAttribute("id", "td3")
+        var td4 = document.createElement('td');
+        td4.setAttribute("id", "td4")
+        var td5 = document.createElement('td');
+        td5.setAttribute("id", "td5")
+        var td5 = document.createElement('td')
         var text1 = document.createTextNode(list[i]['freq']);
-        //var text2 = document.createTextNode(list[i]['word']);
-        //var text3 = document.createTextNode(list[i]['sent']);
         td1.appendChild(text1);
         td2.innerHTML = (list[i]['word'])
-        td3.innerHTML = (list[i]['sent'])
-        //td2.appendChild(text2);
-        //td3.appendChild(text3)
+        td3.innerHTML = (list[i]['sent'][0])
+        td4.innerHTML = (list[i]['sent'][1])
+        td5.innerHTML = (list[i]['sent'][2])
+        //for (var i = 1, i <= 5, i++){
+        //    tr.appendChild('td' + i)}
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3)
+        tr.appendChild(td4)
+        tr.appendChild(td4)
+        tr.appendChild(td5)
         tb1.appendChild(tr);
         }
         console.log("finished creating")

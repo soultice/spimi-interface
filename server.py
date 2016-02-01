@@ -46,20 +46,18 @@ def return_freq_after():
             if ahit < (len(sentence)):
                 after = sentence[ahit]
                 after_count.update([after])
-                sentence[ahit] = ('<span class=\"wmatch\">' + sentence[ahit]
-                                    + '</span>')
-                sentence[qhit] = ('<span class=\"qmatch\">' + sentence[qhit]
-                                    + '</span>')
+                sent_before = ' '.join(sentence[:qhit])
+                sent_after = ' '.join(sentence[qhit+1:])
+                wic = [sent_before, query, sent_after]
                 if after not in words.keys():
-                    words[after] = [sentence]
+                    words[after] = [wic]
                 else:
-                    words[after].append(sentence)
+                    words[after].append(wic)
     to_return = []
     for word, count in after_count.most_common(50):
         for idx, sent in enumerate(words[word]):
-            if idx < 20:
-                sent = ' '.join(sent)
-                to_return.append({'word': '<span class=\"wmatch\">' + word + '</span>',
+            if idx < 1:
+                to_return.append({'word': word,
                                 'freq': count,
                                 'sent': sent})
     return(json.dumps(to_return))
@@ -85,20 +83,18 @@ def return_freq_prev():
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
-                sentence[prehit] = ('<span class=\"wmatch\">' + sentence[prehit]
-                                    + '</span>')
-                sentence[qhit] = ('<span class=\"qmatch\">' + sentence[qhit]
-                                    + '</span>')
+                sent_before = ' '.join(sentence[:qhit])
+                sent_after = ' '.join(sentence[qhit+1:])
+                wic = [sent_before, query, sent_after]
                 if prev not in words.keys():
-                    words[prev] = [sentence]
+                    words[prev] = [wic]
                 else:
-                    words[prev].append(sentence)
+                    words[prev].append(wic)
     to_return = []
     for word, count in prev_count.most_common(50):
         for idx, sent in enumerate(words[word]):
-            if idx < 20:
-                sent = ' '.join(sent)
-                to_return.append({'word': '<span class=\"wmatch\">' + word + '</span>',
+            if idx < 1:
+                to_return.append({'word': word,
                                 'freq': count,
                                 'sent': sent})
     return(json.dumps(to_return))
@@ -117,23 +113,23 @@ def return_cooc():
     for sentence in sentences:
         sentence = sentence.split()
         if query in sentence and cooc in sentence:
+            print(sentence)
             cooc_count.update([cooc])
             qhit = sentence.index(query)
-            chit = sentence.indext(cooc)
-            sentence[chit] = ('<span class=\"wmatch\">' + sentence[prehit]
-                                + '</span>')
-            sentence[qhit] = ('<span class=\"qmatch\">' + sentence[qhit]
-                                + '</span>')
+            chit = sentence.index(cooc)
+            sent_before = ' '.join(sentence[:qhit])
+            sent_after = ' '.join(sentence[qhit+1:])
+            wic = [sent_before, query, sent_after]
             if cooc not in words.keys():
-                words[cooc] = [sentence]
+                words[cooc] = [wic]
             else:
-                words[cooc].append(sentence)
+                words[cooc].append(wic)
+    print(words)
     to_return = []
     for word, count in cooc_count.most_common(50):
         for idx, sent in enumerate(words[word]):
             if idx < 20:
-                sent = ' '.join(sent)
-                to_return.append({'word': '<span class=\"wmatch\"' + word + '<span>',
+                to_return.append({'word': word,
                                   'freq': count,
                                   'sent': sent})
 
