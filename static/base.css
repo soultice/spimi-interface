@@ -6,22 +6,47 @@
 color: green;
 }
 
-table {
- text-padding: 15px 
- }
+.freq_table {
+width: 100%;
+}
 
-td #td1 {
- width: '10%';
- text-align: center;
- }
+.freq_table tr {
+line-height:18px;
+white-space: nowrap;
+}
 
-td #td2 {
- width: '20%';
- text-align: center;
- text-color: blue;
- }
+.freq_table td {
+max-width: 0;
+overflow: hidden;
+text-overflow: ellipsis;}
 
 th {
  text-align: center;
  }
+
+#td1 {
+ width: 5%;
+}
+
+#td2 {
+ width: 10%;
+ }
+
+#td3 {
+ width: 35%;
+ text-align: right;
+ direction: rtl;
+}
+
+#td4 {
+ width: 10%;
+ text-align: center;
+ color: blue;
+ }
+
+#td5 {
+ width: 35%;
+ text-align: left;
+ direction: rtl;
+}
 
