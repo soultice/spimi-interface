@@ -17,9 +17,9 @@ def rec_dd():
     return defaultdict(rec_dd)
 
 def get_output(query):
-    output = subprocess.check_output(['./bin/spimi-retrieve',
+    output = subprocess.check_output(['../bin/spimi-retrieve',
                                       'H',
-                                      '--i', './bin/var/',
+                                      '--i', '../bin/var/',
                                       '--ngram', query])
     output = re.sub('[^a-zA-Z0-9\n\.]', ' ', output)
     sentences = output.decode('utf-8').split('\n')
@@ -46,8 +46,9 @@ def return_freq_after():
             if ahit < (len(sentence)):
                 after = sentence[ahit]
                 after_count.update([after])
+                sent_after= ' '.join(['<span class=\"qmatch\">' + after+ '</span>'
+                                      if after == w else w for w in sentence[qhit+1:]])
                 sent_before = ' '.join(sentence[:qhit])
-                sent_after = ' '.join(sentence[qhit+1:])
                 wic = [sent_before, query, sent_after]
                 if after not in words.keys():
                     words[after] = [wic]
@@ -58,8 +59,8 @@ def return_freq_after():
         for idx, sent in enumerate(words[word]):
             if idx < 1:
                 to_return.append({'word': word,
-                                'freq': count,
-                                'sent': sent})
+                                  'freq': count,
+                                  'sent': sent})
     return(json.dumps(to_return))
 
 
@@ -83,7 +84,8 @@ def return_freq_prev():
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
-                sent_before = ' '.join(sentence[:qhit])
+                sent_before = ' '.join(['<span class=\"qmatch\">' + prev + '</span>'
+                                        if prev == w else w for w in sentence[:qhit]])
                 sent_after = ' '.join(sentence[qhit+1:])
                 wic = [sent_before, query, sent_after]
                 if prev not in words.keys():
@@ -95,43 +97,41 @@ def return_freq_prev():
         for idx, sent in enumerate(words[word]):
             if idx < 1:
                 to_return.append({'word': word,
-                                'freq': count,
-                                'sent': sent})
+                                  'freq': count,
+                                  'sent': sent})
     return(json.dumps(to_return))
 
-@app.route('/spimi/api/get_cooc', methods=['GET'])
+@app.route('/spimi/api/get_cooc', methods=['GET', 'POST'])
 def return_cooc():
     """Returns sentences containing query as well as a second word
 
        :returns nested list of [dict(word, frequency, sent)]:
        """
     query = request.args.get('q', '')
-    query, cooc = query.split(';')
     sentences = get_output(query)
     words = rec_dd()
-    cooc_count = Counter()
+    cont_count = Counter()
     for sentence in sentences:
         sentence = sentence.split()
-        if query in sentence and cooc in sentence:
-            print(sentence)
-            cooc_count.update([cooc])
+        if query in sentence:
             qhit = sentence.index(query)
-            chit = sentence.index(cooc)
-            sent_before = ' '.join(sentence[:qhit])
-            sent_after = ' '.join(sentence[qhit+1:])
-            wic = [sent_before, query, sent_after]
-            if cooc not in words.keys():
-                words[cooc] = [wic]
-            else:
-                words[cooc].append(wic)
-    print(words)
+            for word in sentence:
+                cont_count.update([word])
+                sent_before = ' '.join(['<span class=\"qmatch\">' + word + '</span>'
+                                        if word == w else w for w in sentence[:qhit]])
+                sent_after= ' '.join(['<span class=\"qmatch\">' + word + '</span>'
+                                        if word == w else w for w in sentence[qhit+1:]])
+                wic = [sent_before, query, sent_after]
+                if word not in words.keys():
+                    words[word] = [wic]
     to_return = []
-    for word, count in cooc_count.most_common(50):
+    print(cont_count.most_common(50))
+    for word, count in cont_count.most_common(50):
         for idx, sent in enumerate(words[word]):
-            if idx < 20:
-                to_return.append({'word': word,
-                                  'freq': count,
-                                  'sent': sent})
+            to_return.append({'word': word,
+                              'freq': count,
+                              'sent': sent 
+                              })
 
     return(json.dumps(to_return))
 

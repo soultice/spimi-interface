@@ -33,37 +33,10 @@
           console.log(Text[0])
           if (Text[0] == undefined){
             alert('The search request did not return a result')}
-          if (document.getElementById('tree').checked) {
-            var returnContent = document.getElementById('returnContent');
-            if (returnContent != null) {
-                parent = returnContent.parentNode;
-                returnContent.innerHTML = Text;
-                var Test = JSON.parse(Text);
-                returnContent.innerHTML = (Object.keys(Test));
-                }
-            else {
-            var returnContent = document.createElement("div");
-            returnContent.setAttribute("id", "returnContent");
-            var contentAppend = document.createTextNode(Text);
-            returnContent.appendChild(contentAppend);
-            var cont = document.getElementById("container");
-            cont.appendChild(returnContent);
-            }
-        }
-          if (document.getElementById('after').checked) {
-            createTable(Text);
-          }
-
-          if (document.getElementById('prev').checked) {
-            createTable(Text);
-          }
-          if (document.getElementById('cooc').checked) {
-            createTable(Text);}
+          createTable(Text);}
+      else {
+          alert('There was a problem with the request.');
       }
-
-        else {
-            alert('There was a problem with the request.');
-        }
     }
   }
 

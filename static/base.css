@@ -3,7 +3,7 @@
  }
 
 .qmatch{
-color: green;
+color: orange;
 }
 
 .freq_table {
@@ -12,6 +12,7 @@ width: 100%;
 
 .freq_table tr {
 line-height:18px;
+font-size: 10pt;
 white-space: nowrap;
 }
 
@@ -25,27 +26,27 @@ th {
  }
 
 #td1 {
- width: 5%;
+ width: 3%;
 }
 
 #td2 {
- width: 10%;
+ width: 7%;
  }
 
 #td3 {
- width: 35%;
+ width: 40%;
  text-align: right;
  direction: rtl;
 }
 
 #td4 {
- width: 10%;
+ width: 8%;
  text-align: center;
  color: blue;
  }
 
 #td5 {
- width: 35%;
+ width: 40%;
  text-align: left;
  direction: rtl;
 }
