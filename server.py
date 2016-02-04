@@ -6,24 +6,27 @@ import subprocess
 import json
 import re
 
-#TODO configuration via Make
-#TODO implement tree visualisation
-#TODO improve api by passing list of hits instead of html code
+# TODO configuration via Make
+# TODO implement tree visualisation
+# TODO improve api by passing list of hits instead of html code
 
 app = Flask(__name__)
 Bootstrap(app)
 
+
 def rec_dd():
     return defaultdict(rec_dd)
+
 
 def get_output(query):
     output = subprocess.check_output(['../bin/spimi-retrieve',
                                       'H',
                                       '--i', '../bin/var/',
                                       '--ngram', query])
-    output = re.sub('[^a-zA-Z0-9\n\.]', ' ', output)
+    output = re.sub('[^a-zA-Z0-9\n]', ' ', output)
     sentences = output.decode('utf-8').split('\n')
     return sentences
+
 
 @app.route('/spimi/api/get_freq_after', methods=['GET'])
 def return_freq_after():

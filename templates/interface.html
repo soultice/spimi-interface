@@ -23,21 +23,40 @@
   <h1> Spimi search </h1>
   <form action="/spimi/api/test/">
     <div class="form-inline">
-      <div class="form group">
-          <label for="Search">Search for word</label>
-          <input  id= 'Search'name="q" type="search" class="form-control" placeholder="Search">
-          <button id='Submit' type="submit" class="btn btn-default">Submit</button>
-          <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-primary active">
-              <input type="radio" name="option" id='prev' checked> sort by previous
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="option" id='after' > sort by following
-            </label>
-            <label class="btn btn-primary">
-              <input type="radio" name="option" id='cooc' > coocurrence
-            </label>
-          </div>
+      <div class='form group'>
+        <div class="input-group-btn">
+          <button tabindex="-1" class="btn btn-default" type="button">Options</button>
+            <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+              <span class="caret"></span>
+          </button>
+          <ul role="menu" class="dropdown-menu">
+
+            <li><a href="#">
+                <input type="checkbox">
+                  <span class="lbl"> Ignore uppercase </span>
+            </a></li>
+
+            <li><a href="#">
+                <input type="checkbox"><span class="lbl">
+                      Ignore punctuation characters</span>
+            </a></li>
+
+          </ul>
+
+          <input id = "Search" name="q" type="text" class="form-control" placeholder="Search for a word">
+              <button id='Submit' type="submit" class="btn btn-default">Submit</button>
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary active">
+                  <input type="radio" name="option" id='prev' checked> sort by previous
+                </label>
+                <label class="btn btn-primary">
+                  <input type="radio" name="option" id='after' > sort by following
+                </label>
+                <label class="btn btn-primary">
+                  <input type="radio" name="option" id='cooc' > coocurrence
+                </label>
+             </div>
+
       </div>
     </div>
   </form>
