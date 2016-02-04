@@ -1,4 +1,7 @@
 (function() {
+  // This is responsible for the http.get methods
+    // it checks the current buttons pressed and starts the http.get 
+    // to the correct address
   document.getElementById("Submit").onclick = function(event) { 
     event.preventDefault();
       var q = document.getElementById("Search").value;
@@ -23,8 +26,9 @@
   };
 
   function makeRequest(url) {
+    // This function starts the request
     httpRequest = new XMLHttpRequest();
-
+    $("#loading").show();
     if (!httpRequest) {
       alert('Giving up :( Cannot create an XMLHTTP instance');
       return false;
@@ -35,8 +39,12 @@
   }
 
   function alertContents() {
+    // Checks for the ready state and status of the respons
+      // throws an error if the .get response is != 200
+      // also starts the create_table function from static/js/createTable.js
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
       if (httpRequest.status === 200) {
+          $("#loading").hide();
           var Text = JSON.parse(httpRequest.responseText);
           if (Text[0] == undefined){
             alert('The search request did not return a result')}
@@ -48,6 +56,7 @@
   }
 
   function createTable(list) {
+      // dynamically creates the table with its contents
     console.log("creating table")
     var cont = document.getElementById("container");
     var tb1 = document.createElement("table");
@@ -55,7 +64,7 @@
     tb1.setAttribute("class", "freq_table")
     tb1.setAttribute("id", "freq_table")
     var thead = document.createElement("thead")
-    var titles = ['Frequency', 'Word', 'Sentence'];
+    var titles = ['freq', 'word', 'left context', 'query', 'right context'];
     for (var i = 0; i< titles.length; i++){
         thead.appendChild(document.createElement("th")).
         appendChild(document.createTextNode(titles[i]))
