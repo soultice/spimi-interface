@@ -1,23 +1,26 @@
 Readme for Spimi Interface
 
-1. Compile spimi
-2. Run ./bin/spimi/spimi-index - specify output to ./bin/var/
-3. Have the files of this repo in the base folder of spimi
-4. Run server.py
-5. Address the server in your browser by localhost:10800/spimi/interface
+1. Clone this repository into the root directory of the spimi version you wish 
+    to work with
+2. Install requirements from requirements.txt via pip install -r requirements.txt
+3. Compile spimi
+4. Run ../bin/spimi/spimi-index - specify output to ../bin/var/
+5. Run server.py (options: -port [int] -debug) -port defaults to 10800
+6. Address the server in your browser by localhost:PORT/spimi/interface
 
     Available options in the spimi-interface:
 
         sort by following: will find the most frequent words AFTER your query
-        and return these words as well as 20 sentences with this constellation
+        and return these words as well as a random sentence with this constellation
 
         sort by previous: does the same as sort by folllowing but with the words
         left to your query
 
-        sort by cooc: will find sentences containing your query and a second word,
-        specified by query;word in the search box.
+        coocurrence: will sort by tye most frequent words in the context of
+        the query and show a random corresponding sentence
 
 Caution: In the current setting, the server will be available to any client
-in your current network. Be sure Port 10800 is not forwarded or to disable
-'debug' in the server.py
+in your current network. Be sure the PORT is not forwarded, except your wish to,
+or start the server without the -debug option. Running the server with -debug
+will enable anyone with access to the address to inject malicious code
 
