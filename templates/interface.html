@@ -5,6 +5,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}"></link>
 {% endblock %}
 
@@ -26,7 +27,8 @@
       <div class='form group'>
         <div class="input-group-btn">
           <button tabindex="-1" class="btn btn-default" type="button">Options</button>
-            <button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+            <button tabindex="-1" data-toggle="dropdown"
+             class="btn btn-default dropdown-toggle" type="button">
               <span class="caret"></span>
           </button>
           <ul role="menu" class="dropdown-menu">
@@ -39,7 +41,8 @@
                     <span class="lbl"> Ignore punctuation characters</span>
             </a></li>
           </ul>
-          <input id = "Search" name="q" type="text" class="form-control" placeholder="Search for a word">
+          <input id = "Search" name="q" type="text" class="form-control"
+           placeholder="Search for a word">
               <button id='Submit' type="submit" class="btn btn-default">Submit</button>
               <div class="btn-group" data-toggle="buttons">
                 <label class="btn btn-primary active">
@@ -55,10 +58,17 @@
       </div>
     </div>
   </form>
+  <div id="loading"></div>
 </div>
 {% endblock %}
 
 
 {% block scripts %}
 <script type"text/javascript" src="{{url_for('static', filename='responseHandler.js')}}"></script>
+<script type="text/javascript">// <![CDATA[
+        function loading(){
+            $("#loading").show();
+            $("#content").hide();
+        }
+// ]]></script>
 {% endblock %}
