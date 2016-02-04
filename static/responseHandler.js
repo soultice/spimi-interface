@@ -2,14 +2,22 @@
   document.getElementById("Submit").onclick = function(event) { 
     event.preventDefault();
       var q = document.getElementById("Search").value;
+      if (document.getElementById('cblower').checked){
+        var cblower = 'True'}
+      if (document.getElementById('cbstrip').checked){
+        var cbstrip = 'True'}
+
       if (document.getElementById('after').checked) {
-          makeRequest('/spimi/api/get_freq_after?q=' + q)
+          makeRequest('/spimi/api/get_freq_after?q=' + q + '&strip=' + cbstrip
+                      + '&lower=' + cblower)
           }
       if (document.getElementById('prev').checked) {
-          makeRequest('/spimi/api/get_freq_prev?q=' + q)
+          makeRequest('/spimi/api/get_freq_prev?q=' + q + '&strip=' + cbstrip
+                     + '&lower=' + cblower)
           }
       if (document.getElementById('cooc').checked) {
-          makeRequest('/spimi/api/get_cooc?q=' + q)
+          makeRequest('/spimi/api/get_cooc?q=' + q + '&strip=' + cbstrip
+                      + '&lower=' + cblower)
           }
       return false;
   };
@@ -30,7 +38,6 @@
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
       if (httpRequest.status === 200) {
           var Text = JSON.parse(httpRequest.responseText);
-          console.log(Text[0])
           if (Text[0] == undefined){
             alert('The search request did not return a result')}
           createTable(Text);}
@@ -66,15 +73,15 @@
         td4.setAttribute("id", "td4")
         var td5 = document.createElement('td');
         td5.setAttribute("id", "td5")
-        var td5 = document.createElement('td')
         var text1 = document.createTextNode(list[i]['freq']);
         td1.appendChild(text1);
         td2.innerHTML = (list[i]['word'])
         td3.innerHTML = (list[i]['sent'][0])
         td4.innerHTML = (list[i]['sent'][1])
         td5.innerHTML = (list[i]['sent'][2])
-        //for (var i = 1, i <= 5, i++){
-        //    tr.appendChild('td' + i)}
+        //for (var i = 1; i <= 5; i++){
+        //    var child = document.getElementById("td" + i)
+        //    tr.appendChild(child)}
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3)
@@ -83,14 +90,13 @@
         tr.appendChild(td5)
         tb1.appendChild(tr);
         }
-        console.log("finished creating")
     if (prevtable != null){
         prevtable.parentNode.removeChild(prevtable)
-        console.log("replacing table")
        }
     cont.appendChild(tb1)
-    console.log("appended table")
     }
+
+  function format_string(string, length) {}
 
 }
 

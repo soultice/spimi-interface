@@ -2,9 +2,11 @@ from flask import Flask, redirect, url_for, render_template, session, \
                   make_response, flash, jsonify, request
 from flask_bootstrap import Bootstrap
 from collections import Counter, defaultdict
+from random import choice
 import subprocess
 import json
 import re
+import argparse
 
 # TODO configuration via Make
 # TODO implement tree visualisation
@@ -18,26 +20,34 @@ def rec_dd():
     return defaultdict(rec_dd)
 
 
-def get_output(query):
+def get_output(query, lower, ignchar):
+    print(lower, ignchar)
     output = subprocess.check_output(['../bin/spimi-retrieve',
                                       'H',
                                       '--i', '../bin/var/',
                                       '--ngram', query])
-    output = re.sub('[^a-zA-Z0-9\n]', ' ', output)
+    if lower != 'undefined':
+        output = output.lower()
+        query = query.lower()
+    if ignchar != 'undefined':
+        output = re.sub('[^a-zA-Z0-9\n]', ' ', output)
     sentences = output.decode('utf-8').split('\n')
-    return sentences
+    return query, sentences
 
 
 @app.route('/spimi/api/get_freq_after', methods=['GET'])
 def return_freq_after():
-    """Return the 50 most frequent words and 20 corresponding sentences
+    """Return the 50 most frequent words and a random sentence that contains
+       an example containing the query
        at the left side of the current query. As well as the sentences
        containing these at the correct position and the frequency
 
        :returns: nested list of [dict(word, frequency, sent)]:
        :rtype: json"""
     query = request.args.get('q', '')
-    sentences = get_output(query)
+    lowercase = request.args.get('lower', False)
+    ignchar = request.args.get('strip', False)
+    query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     after_count = Counter()
     for sentence in sentences:
@@ -59,11 +69,10 @@ def return_freq_after():
                     words[after].append(wic)
     to_return = []
     for word, count in after_count.most_common(50):
-        for idx, sent in enumerate(words[word]):
-            if idx < 1:
-                to_return.append({'word': word,
-                                  'freq': count,
-                                  'sent': sent})
+        sent = choice(words[word])
+        to_return.append({'word': word,
+                            'freq': count,
+                            'sent': sent})
     return(json.dumps(to_return))
 
 
@@ -76,7 +85,9 @@ def return_freq_prev():
        :returns: nested list of [dict(word, frequency, sent)]
        :rtype: json"""
     query = request.args.get('q', '')
-    sentences = get_output(query)
+    lowercase = request.args.get('lower', False)
+    ignchar = request.args.get('strip', False)
+    query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     prev_count = Counter()
     for sentence in sentences:
@@ -97,11 +108,10 @@ def return_freq_prev():
                     words[prev].append(wic)
     to_return = []
     for word, count in prev_count.most_common(50):
-        for idx, sent in enumerate(words[word]):
-            if idx < 1:
-                to_return.append({'word': word,
-                                  'freq': count,
-                                  'sent': sent})
+        sent = choice(words[word])
+        to_return.append({'word': word,
+                            'freq': count,
+                            'sent': sent})
     return(json.dumps(to_return))
 
 @app.route('/spimi/api/get_cooc', methods=['GET', 'POST'])
@@ -111,7 +121,9 @@ def return_cooc():
        :returns nested list of [dict(word, frequency, sent)]:
        """
     query = request.args.get('q', '')
-    sentences = get_output(query)
+    lowercase = request.args.get('lower', False)
+    ignchar = request.args.get('strip', False)
+    query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     cont_count = Counter()
     for sentence in sentences:
@@ -127,14 +139,15 @@ def return_cooc():
                 wic = [sent_before, query, sent_after]
                 if word not in words.keys():
                     words[word] = [wic]
+                else:
+                    words[word].append(wic)
     to_return = []
-    print(cont_count.most_common(50))
     for word, count in cont_count.most_common(50):
-        for idx, sent in enumerate(words[word]):
-            to_return.append({'word': word,
-                              'freq': count,
-                              'sent': sent 
-                              })
+        sent = choice(words[word])
+        to_return.append({'word': word,
+                        'freq': count,
+                        'sent': sent
+                        })
 
     return(json.dumps(to_return))
 
@@ -193,12 +206,20 @@ def return_json():
 
 @app.route('/spimi/api/test', methods=['GET'])
 def parse_search():
-    return render_template('interface.html') 
+    return render_template('interface.html')
 
 
 @app.route('/spimi/interface')
 def test_interface():
     return render_template('interface.html')
 
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-port', type=int, default=10800)
+    parser.add_argument('-debug', action='store_true', default=False)
+    return parser
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10800,debug=True)
+    parser = create_parser()
+    args = parser.parse_args()
+    app.run(host='0.0.0.0', port=args.port ,debug=args.debug)

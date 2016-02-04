@@ -48,6 +48,16 @@ th {
 #td5 {
  width: 40%;
  text-align: left;
- direction: rtl;
 }
 
+#td3:hover{
+ white-space: normal;
+ overflow:visible;
+ text-overflow: normal;
+}
+
+#td5:hover{
+ white-space: normal;
+ overflow:visible;
+ text-overflow: normal;
+ }
