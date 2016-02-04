@@ -17,33 +17,55 @@ Bootstrap(app)
 
 
 def rec_dd():
+    """Function to create a nested defaultdict
+
+    :returns: a nested defaultdict
+    :rtype: defaultdict
+    """
     return defaultdict(rec_dd)
 
 
 def get_output(query, lower, ignchar):
+    """Function to fetch and parse the output of spimi
+    
+    :params:
+    :query: the word to call spimi-retrieve with
+    :lower: whether the returned text should be lowercased or not
+    :ignchar: whether punctuation characters will be removed or not
+
+    :returns: tuple of (query, list of sentences)
+    :rtype: tuple
+    """
     print(lower, ignchar)
     output = subprocess.check_output(['../bin/spimi-retrieve',
                                       'H',
                                       '--i', '../bin/var/',
                                       '--ngram', query])
+    output = output.decode('utf8')
     if lower != 'undefined':
         output = output.lower()
         query = query.lower()
     if ignchar != 'undefined':
         output = re.sub('[^a-zA-Z0-9\n]', ' ', output)
-    sentences = output.decode('utf-8').split('\n')
+        sentences = output.split('\n')
+    else:
+        output = ' '.join(re.split(r'(\W)', output))
+        output = re.sub(r' +', ' ', output)
+        sentences = re.split('\n', output)
     return query, sentences
 
 
 @app.route('/spimi/api/get_freq_after', methods=['GET'])
 def return_freq_after():
-    """Return the 50 most frequent words and a random sentence that contains
-       an example containing the query
-       at the left side of the current query. As well as the sentences
-       containing these at the correct position and the frequency
+    """Return the 50 most frequent words succeding the query, their frequency,
+       and a random sample that contains an example containing the query,
+       it's left and right context where the query as well as the current
+       most word per line is highlighted
+       (marked with qmatch and colored with css)
 
        :returns: nested list of [dict(word, frequency, sent)]:
-       :rtype: json"""
+       :rtype: json
+    """
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
     ignchar = request.args.get('strip', False)
@@ -59,8 +81,18 @@ def return_freq_after():
             if ahit < (len(sentence)):
                 after = sentence[ahit]
                 after_count.update([after])
-                sent_after= ' '.join(['<span class=\"qmatch\">' + after+ '</span>'
+                # Need to do the following lines to highlight the words in
+                # the html document, this will be found in the preceding
+                # functions as well
+                sent_after= ' '.join(['<span class=\"wmatch\">'
+                                      + after + '</span>'
                                       if after == w else w for w in sentence[qhit+1:]])
+                sent_before= ' '.join(['<span class=\"wmatch\">'
+                                      + after + '</span>'
+                                      if after == w else w for w in sentence[:qhit]])
+                wic = [sent_before, query, sent_after]
+                if after not in words.keys():
+                    words[after] = [wic]
                 sent_before = ' '.join(sentence[:qhit])
                 wic = [sent_before, query, sent_after]
                 if after not in words.keys():
@@ -78,12 +110,15 @@ def return_freq_after():
 
 @app.route('/spimi/api/get_freq_prev', methods=['GET'])
 def return_freq_prev():
-    """Return the 50 most frequent words and 20 corresponding sentences
-       at the left side of the current query. As well as the sentences
-       containing these at the correct position and the frequency
+    """Return the 50 most frequent words preceding the query, their frequency,
+       and a random sample that contains an example containing the query,
+       it's left and right context where the query as well as the
+       current word per line is highlighted
+       (marked with qmatch and colored with css)
 
-       :returns: nested list of [dict(word, frequency, sent)]
-       :rtype: json"""
+       :returns: nested list of [dict(word, frequency, sent)]:
+       :rtype: json
+    """
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
     ignchar = request.args.get('strip', False)
@@ -98,9 +133,10 @@ def return_freq_prev():
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
-                sent_before = ' '.join(['<span class=\"qmatch\">' + prev + '</span>'
+                sent_before = ' '.join(['<span class=\"wmatch\">' + prev + '</span>'
                                         if prev == w else w for w in sentence[:qhit]])
-                sent_after = ' '.join(sentence[qhit+1:])
+                sent_after= ' '.join(['<span class=\"wmatch\">' + prev + '</span>'
+                                        if prev == w else w for w in sentence[qhit+1:]])
                 wic = [sent_before, query, sent_after]
                 if prev not in words.keys():
                     words[prev] = [wic]
@@ -116,9 +152,13 @@ def return_freq_prev():
 
 @app.route('/spimi/api/get_cooc', methods=['GET', 'POST'])
 def return_cooc():
-    """Returns sentences containing query as well as a second word
+    """Returns the 50 most frequent words coocurring the query,
+       their frequency as well as a random sample containing the query,
+       its left and right context, where the query as well as the coocurring
+       word is highlighted
 
        :returns nested list of [dict(word, frequency, sent)]:
+       :rtype: json
        """
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
@@ -132,9 +172,9 @@ def return_cooc():
             qhit = sentence.index(query)
             for word in sentence:
                 cont_count.update([word])
-                sent_before = ' '.join(['<span class=\"qmatch\">' + word + '</span>'
+                sent_before = ' '.join(['<span class=\"wmatch\">' + word + '</span>'
                                         if word == w else w for w in sentence[:qhit]])
-                sent_after= ' '.join(['<span class=\"qmatch\">' + word + '</span>'
+                sent_after= ' '.join(['<span class=\"wmatch\">' + word + '</span>'
                                         if word == w else w for w in sentence[qhit+1:]])
                 wic = [sent_before, query, sent_after]
                 if word not in words.keys():
@@ -152,64 +192,12 @@ def return_cooc():
     return(json.dumps(to_return))
 
 
-
-
 @app.route('/spimi/api/build_tree', methods=['GET'])
 def return_json():
-    """Return a formatted JSON for usage with d3.tree() """
-    query = request.args.get('q', '')
-    sentences = get_output(query)
-    sent_until_query = [sentence[:sentence.index(query)]
-                        for sentence in sentences if query in sentence]
-    sent_after_query = [sentence[sentence.index(query):] for sentence in
-                        sentences if query in sentence]
-    wordpos = rec_dd()
-    #wordpos['name'] = query
-    #wordpos['children'] = [dict()]
-    #for sentence in sent_until_query:
-    #    sentence = sentence.split()
-    #    dictposition = wordpos['children']
-    #    for idx, curr in enumerate(sentence):
-    #        dictposition['name'] = curr
-    #        dictposition['children'] = [dict()]
-    #        if idx > 1:
-    #            prev = sentence[sentence.index(curr)-1:sentence.index(curr)]
-    #            for keys in (prev):
-        #                dictposition = dictposition['children']
-
-    for sentence in sent_until_query:
-        sentence = sentence.split()
-        for (idx, (prev, curr)) in enumerate(zip(sentence, sentence[1:])):
-            if curr not in wordpos['prev'][idx].keys():
-                wordpos['prev'][idx][curr] = set([prev])
-            else:
-                wordpos['prev'][idx][curr].update([prev])
-    for sentence in sent_after_query:
-        sentence = sentence.split()
-        for (idx, (prev, curr)) in enumerate(zip(sentence, sentence[1:])):
-            if curr not in wordpos['after'][idx].keys():
-                wordpos['after'][idx][curr] = set([prev])
-            else:
-                wordpos['after'][idx][curr].update([prev])
-
-    for idx in wordpos['prev'].keys():
-#        wordpos['prev'][idx]['Counts'] = Counter(wordpos['prev'][idx].keys())
-        for word in wordpos['prev'][idx].keys():
-            wordpos['prev'][idx][word] = list(wordpos['prev'][idx][word])
-    for idx in wordpos['after'].keys():
-#        wordpos['after'][idx]['Counts'] = Counter(wordpos['after'][idx].keys())
-        for word in wordpos['after'][idx].keys():
-            wordpos['after'][idx][word] = list(wordpos['after'][idx][word])
-
-    return jsonify(wordpos)
-
-
-@app.route('/spimi/api/test', methods=['GET'])
-def parse_search():
-    return render_template('interface.html')
-
+    pass
 
 @app.route('/spimi/interface')
+# Initial call to the interface
 def test_interface():
     return render_template('interface.html')
 
