@@ -1,8 +1,4 @@
 .wmatch{
- color: blue;
- }
-
-.qmatch{
 color: orange;
 }
 
@@ -17,16 +13,17 @@ white-space: nowrap;
 }
 
 .freq_table td {
-max-width: 0;
-overflow: hidden;
-text-overflow: ellipsis;}
+ max-width: 0;
+ overflow: hidden;
+ text-overflow: ellipsis;
+}
 
 th {
  text-align: center;
  }
 
 #td1 {
- width: 3%;
+ width: 5%;
 }
 
 #td2 {
@@ -34,10 +31,10 @@ th {
  }
 
 #td3 {
- width: 40%;
+ text-overflow: normal;
+ width: 39%;
  text-align: right;
- direction: rtl;
-}
+ direction: rtl;}
 
 #td4 {
  width: 8%;
@@ -46,7 +43,7 @@ th {
  }
 
 #td5 {
- width: 40%;
+ width: 39%;
  text-align: left;
 }
 
@@ -61,3 +58,14 @@ th {
  overflow:visible;
  text-overflow: normal;
  }
+
+div#loading {
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    display: none;
+    background: url(ajax-loader.gif) no-repeat;
+    cursor: wait;
+    }
