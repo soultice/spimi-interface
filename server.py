@@ -36,7 +36,7 @@ def get_output(query, lower, ignchar):
     :returns: tuple of (query, list of sentences)
     :rtype: tuple
     """
-    print(lower, ignchar)
+    print(query)
     output = subprocess.check_output(['../bin/spimi-retrieve',
                                       'H',
                                       '--i', '../bin/var/',
@@ -73,10 +73,15 @@ def return_freq_after():
     words = rec_dd()
     after_count = Counter()
     for sentence in sentences:
-        sentence = sentence.split()
         if query in sentence:
             qhit = sentence.index(query)
-            pos = sentence[qhit]
+            qlen = len(query)
+            qpart = [sentence[qhit:qhit+qlen]]
+            prepart = sentence[:qhit].split()
+            aftpart = sentence[qhit+qlen:].split()
+            sentence = prepart + qpart + aftpart
+            # Need to index again since we had to take care of multiword requests
+            qhit = sentence.index(query)
             ahit = sentence.index(query)+1
             if ahit < (len(sentence)):
                 after = sentence[ahit]
@@ -126,10 +131,15 @@ def return_freq_prev():
     words = rec_dd()
     prev_count = Counter()
     for sentence in sentences:
-        sentence = sentence.split()
         if query in sentence:
             qhit = sentence.index(query)
+            qlen = len(query)
             if qhit > 0:
+                qpart = [sentence[qhit:qhit+qlen]]
+                aftpart = sentence[qhit+qlen:].split()
+                prepart = sentence[:qhit].split()
+                sentence = prepart + qpart + aftpart
+                qhit = sentence.index(query)
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
@@ -167,8 +177,13 @@ def return_cooc():
     words = rec_dd()
     cont_count = Counter()
     for sentence in sentences:
-        sentence = sentence.split()
         if query in sentence:
+            qhit = sentence.index(query)
+            qlen = len(query)
+            qpart = [sentence[qhit:qhit+qlen]]
+            prepart = sentence[:qhit].split()
+            aftpart = sentence[qhit+qlen:].split()
+            sentence = prepart + qpart + aftpart
             qhit = sentence.index(query)
             for word in sentence:
                 cont_count.update([word])
