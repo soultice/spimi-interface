@@ -55,6 +55,17 @@ def get_output(query, lower, ignchar):
     return query, sentences
 
 
+def mark_sentence(qpos, word, sentence):
+    sent_before= ' '.join(['<span class=\"wmatch\">'
+                         + word + '</span>'
+                         if word == w else w for w in sentence[:qpos]])
+    sent_after= ' '.join(['<span class=\"wmatch\">'
+                         + word + '</span>'
+                         if word == w else w for w in sentence[qpos+1:]])
+    return sent_before, sent_after
+
+
+
 @app.route('/spimi/api/get_freq_after', methods=['GET'])
 def return_freq_after():
     """Return the 50 most frequent words succeding the query, their frequency,
@@ -89,12 +100,7 @@ def return_freq_after():
                 # Need to do the following lines to highlight the words in
                 # the html document, this will be found in the preceding
                 # functions as well
-                sent_after= ' '.join(['<span class=\"wmatch\">'
-                                      + after + '</span>'
-                                      if after == w else w for w in sentence[qhit+1:]])
-                sent_before= ' '.join(['<span class=\"wmatch\">'
-                                      + after + '</span>'
-                                      if after == w else w for w in sentence[:qhit]])
+                sent_before, sent_after = mark_sentence(qhit, after, sentence)
                 wic = [sent_before, query, sent_after]
                 if after not in words.keys():
                     words[after] = [wic]
@@ -102,7 +108,7 @@ def return_freq_after():
                 wic = [sent_before, query, sent_after]
                 if after not in words.keys():
                     words[after] = [wic]
-                else:
+                elif wic not in words[after]:
                     words[after].append(wic)
     to_return = []
     for word, count in after_count.most_common(50):
@@ -143,14 +149,11 @@ def return_freq_prev():
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
-                sent_before = ' '.join(['<span class=\"wmatch\">' + prev + '</span>'
-                                        if prev == w else w for w in sentence[:qhit]])
-                sent_after= ' '.join(['<span class=\"wmatch\">' + prev + '</span>'
-                                        if prev == w else w for w in sentence[qhit+1:]])
+                sent_before, sent_after = mark_sentence(qhit, prev, sentence)
                 wic = [sent_before, query, sent_after]
                 if prev not in words.keys():
                     words[prev] = [wic]
-                else:
+                elif wic not in words[prev]:
                     words[prev].append(wic)
     to_return = []
     for word, count in prev_count.most_common(50):
@@ -178,6 +181,7 @@ def return_cooc():
     cont_count = Counter()
     for sentence in sentences:
         if query in sentence:
+            sentlen = len(sentence)
             qhit = sentence.index(query)
             qlen = len(query)
             qpart = [sentence[qhit:qhit+qlen]]
@@ -187,14 +191,11 @@ def return_cooc():
             qhit = sentence.index(query)
             for word in sentence:
                 cont_count.update([word])
-                sent_before = ' '.join(['<span class=\"wmatch\">' + word + '</span>'
-                                        if word == w else w for w in sentence[:qhit]])
-                sent_after= ' '.join(['<span class=\"wmatch\">' + word + '</span>'
-                                        if word == w else w for w in sentence[qhit+1:]])
+                sent_before, sent_after = mark_sentence(qhit, word, sentence)
                 wic = [sent_before, query, sent_after]
                 if word not in words.keys():
                     words[word] = [wic]
-                else:
+                elif wic not in words[word]:
                     words[word].append(wic)
     to_return = []
     for word, count in cont_count.most_common(50):
