@@ -56,12 +56,15 @@ def get_output(query, lower, ignchar):
 
 
 def mark_sentence(qpos, word, sentence):
-    sent_before= ' '.join(['<span class=\"wmatch\">'
-                         + word + '</span>'
-                         if word == w else w for w in sentence[:qpos]])
-    sent_after= ' '.join(['<span class=\"wmatch\">'
-                         + word + '</span>'
-                         if word == w else w for w in sentence[qpos+1:]])
+
+    sent_before = ' '.join([w for w in sentence[:qpos]])
+    sent_after = ' '.join([w for w in sentence[qpos+1:]])
+#    sent_before= ' '.join(['<span class=\"wmatch\">'
+#                         + word + '</span>'
+#                         if word == w else w for w in sentence[:qpos]])
+#    sent_after= ' '.join(['<span class=\"wmatch\">'
+#                         + word + '</span>'
+#                         if word == w else w for w in sentence[qpos+1:]])
     return sent_before, sent_after
 
 

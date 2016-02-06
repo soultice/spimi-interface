@@ -57,7 +57,6 @@
 
   function createTable(list) {
       // dynamically creates the table with its contents
-    console.log("creating table")
     var cont = document.getElementById("container");
     var tb1 = document.createElement("table");
     var prevtable = document.getElementById("freq_table")
@@ -73,18 +72,19 @@
     for (var  i = 0; i < list.length; i++){
         var tr = document.createElement('tr');
         var td1 = document.createElement('td');
-        td1.setAttribute("id", "td1")
+        td1.setAttribute("class", "td1")
         var td2 = document.createElement('td');
-        td2.setAttribute("id", "td2")
+        td2.setAttribute("class", "td2")
         var td3 = document.createElement('td');
-        td3.setAttribute("id", "td3")
+        td3.setAttribute("class", "td3")
         var td4 = document.createElement('td');
-        td4.setAttribute("id", "td4")
+        td4.setAttribute("class", "td4")
         var td5 = document.createElement('td');
-        td5.setAttribute("id", "td5")
+        td5.setAttribute("class", "td5")
         var text1 = document.createTextNode(list[i]['freq']);
         td1.appendChild(text1);
         td2.innerHTML = (list[i]['word'])
+        //console.log(list[i]['sent'][0].length, list[i]['sent'][0])
         td3.innerHTML = (list[i]['sent'][0])
         td4.innerHTML = (list[i]['sent'][1])
         td5.innerHTML = (list[i]['sent'][2])
@@ -100,12 +100,28 @@
         tb1.appendChild(tr);
         }
     if (prevtable != null){
+        calculate_max_td()
         prevtable.parentNode.removeChild(prevtable)
        }
     cont.appendChild(tb1)
     }
 
-  function format_string(string, length) {}
+  function format_string(string) {
+    }
+
+  function calculate_max_td(){
+    var cont = document.getElementById("container");
+    var str = document.createElement("str")
+    var threes = document.getElementsByClassName("td3")[0]
+    str.innerHTML = "A"
+    str.setAttribute("id", "str")
+    cont.appendChild(str)
+    strid = document.getElementById("str")
+    console.log("client width:", cont.clientWidth * 0.39)
+    console.log("body width",document.body.clientWidth)
+    console.log("charwidth",str.offsetWidth)
+    console.log(threes.innerHTML.length, threes.innerHTML)
+  }
 
 }
 
