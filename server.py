@@ -37,12 +37,12 @@ def get_output(query, lower, ignchar):
     :returns: tuple of (query, list of sentences)
     :rtype: tuple
     """
-    print(query)
     output = subprocess.check_output(['../bin/spimi-retrieve',
                                       'H',
                                       '--i', '../bin/var/',
                                       '--ngram', query])
-    output = output.decode('utf8')
+    print(query, type(output))
+    output = output.decode('utf8', 'ignore')
     if lower != 'undefined':
         output = output.lower()
         query = query.lower()
@@ -196,7 +196,8 @@ def return_cooc():
             sentence = prepart + qpart + aftpart
             qhit = sentence.index(query)
             for word in sentence:
-                cont_count.update([word])
+                if word != query:
+                    cont_count.update([word])
                 sent_before, sent_after = mark_sentence(qhit, word, sentence)
                 wic = (sent_before, query, sent_after)
                 if word not in words.keys():

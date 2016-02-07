@@ -136,8 +136,9 @@
         //console.log("length: ",strarray.join(" ").length, maxlen, strarray[i], mkword);
         if (strarray[i-1] !== "."){
         strarray[i] = "."}
-        else if (strarray[i-1] === "."){
-        strarray.splice(i,i);}
+        else if (strarray[i-1] === "." ){
+        strarray.splice(i,i)
+        i--;}
       }
       string = (strarray.join(" "));
     }
