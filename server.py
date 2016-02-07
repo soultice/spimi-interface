@@ -7,6 +7,7 @@ import subprocess
 import json
 import re
 import argparse
+import time
 
 # TODO configuration via Make
 # TODO implement tree visualisation
@@ -176,12 +177,14 @@ def return_cooc():
        :returns nested list of [dict(word, frequency, sent)]:
        :rtype: json
        """
+    starttime = time.clock()
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
     ignchar = request.args.get('strip', False)
     query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     cont_count = Counter()
+    print (len(sentences))
     for sentence in sentences:
         if query in sentence:
             sentlen = len(sentence)
@@ -195,19 +198,21 @@ def return_cooc():
             for word in sentence:
                 cont_count.update([word])
                 sent_before, sent_after = mark_sentence(qhit, word, sentence)
-                wic = [sent_before, query, sent_after]
+                wic = (sent_before, query, sent_after)
                 if word not in words.keys():
-                    words[word] = [wic]
+                    words[word] = set((wic))
                 elif wic not in words[word]:
-                    words[word].append(wic)
+                    words[word].add((wic))
     to_return = []
     for word, count in cont_count.most_common(50):
-        sent = choice(words[word])
+        sent = choice(list(words[word]))
         to_return.append({'word': word,
                         'freq': count,
                         'sent': sent
                         })
 
+    endtime = time.clock()
+    print("request complete, this took: " ,endtime - starttime, "seconds")
     return(json.dumps(to_return))
 
 

@@ -134,9 +134,12 @@
     for (var i = 0; i < strarray.length; i++){
       if (strarray.join(" ").length > maxlen && strarray[i] != mkword){
         //console.log("length: ",strarray.join(" ").length, maxlen, strarray[i], mkword);
-        strarray[i] = "."
+        if (strarray[i-1] !== "."){
+        strarray[i] = "."}
+        else if (strarray[i-1] === "."){
+        strarray.splice(i,i);}
       }
-      string = join_points(strarray);
+      string = (strarray.join(" "));
     }
     console.log("for word: ", mkword ,"\nshortened: ", strbuf, "\nto:", strarray.join(" "))
     return string
