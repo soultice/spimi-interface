@@ -164,6 +164,8 @@
     //Smooth way to calculate maximum fitting characters for a table cell
     //getting width of fixed width font letter, as well as width of table cell
     // => maximum chars = width of table cell / width of char
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    console.log('browser is firefox: ', isFirefox)
     var cont = document.getElementById("container");
     var str = document.createElement("str");
     str.innerHTML = "A";
@@ -171,8 +173,15 @@
     cont.appendChild(str);
     strid = document.getElementById("str");
     console.log("client width:", cont.clientWidth * 0.39);
-    console.log("charwidth",str.offsetWidth);
-    var maxchars = Math.floor(cont.clientWidth * 0.39 / str.offsetWidth);
+    if (isFirefox){
+      console.log("browser is firefox, increased charwidth by 1")
+      console.log("charwidth",str.offsetWidth+1);
+      var maxchars = Math.floor(cont.clientWidth * 0.39 / (str.offsetWidth+1) );
+    }
+    else {
+      console.log("charwidth",str.offsetWidth);
+      var maxchars = Math.floor(cont.clientWidth * 0.39 / (str.offsetWidth) );
+      }
     console.log("maxchars:", maxchars);
     strid.parentNode.removeChild(strid);
     return maxchars
