@@ -41,8 +41,8 @@ def get_output(query, lower, ignchar):
                                       'H',
                                       '--i', '../bin/var/',
                                       '--ngram', query])
-    print(query, type(output))
     output = output.decode('utf8', 'ignore')
+    print(query, 'output type: ', type(output))
     if lower != 'undefined':
         output = output.lower()
         query = query.lower()
@@ -103,22 +103,16 @@ def return_freq_after():
             if ahit < (len(sentence)):
                 after = sentence[ahit]
                 after_count.update([after])
-                # Need to do the following lines to highlight the words in
-                # the html document, this will be found in the preceding
-                # functions as well
                 sent_before, sent_after = mark_sentence(qhit, after, sentence)
-                wic = [sent_before, query, sent_after]
+                wic = (sent_before, query, sent_after)
                 if after not in words.keys():
-                    words[after] = [wic]
-                sent_before = ' '.join(sentence[:qhit])
-                wic = [sent_before, query, sent_after]
-                if after not in words.keys():
-                    words[after] = [wic]
-                elif wic not in words[after]:
-                    words[after].append(wic)
+                    words[after] = set()
+                    words[after].add((wic))
+                else:
+                    words[after].add((wic))
     to_return = []
     for word, count in after_count.most_common(50):
-        sent = choice(words[word])
+        sent = choice(list(words[word]))
         to_return.append({'word': word,
                             'freq': count,
                             'sent': sent})
@@ -156,14 +150,15 @@ def return_freq_prev():
                 prev = sentence[prehit]
                 prev_count.update([prev])
                 sent_before, sent_after = mark_sentence(qhit, prev, sentence)
-                wic = [sent_before, query, sent_after]
+                wic = (sent_before, query, sent_after)
                 if prev not in words.keys():
-                    words[prev] = [wic]
-                elif wic not in words[prev]:
-                    words[prev].append(wic)
+                    words[prev] = set()
+                    words[prev].add((wic))
+                else:
+                    words[prev].add((wic))
     to_return = []
     for word, count in prev_count.most_common(50):
-        sent = choice(words[word])
+        sent = choice(list(words[word]))
         to_return.append({'word': word,
                             'freq': count,
                             'sent': sent})
@@ -205,7 +200,7 @@ def return_cooc():
                 if word not in words.keys():
                     words[word] = set()
                     words[word].add((wic))
-                elif wic not in words[word]:
+                else:
                     words[word].add((wic))
     to_return = []
     for word, count in cont_count.most_common(50):

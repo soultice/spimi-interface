@@ -164,6 +164,8 @@
     //Smooth way to calculate maximum fitting characters for a table cell
     //getting width of fixed width font letter, as well as width of table cell
     // => maximum chars = width of table cell / width of char
+    // Somehow firefox returns too small of a value with str.offsetWidth
+    // which is why we need to check if the user is using Firefox and increase the value
     var isFirefox = typeof InstallTrigger !== 'undefined';
     console.log('browser is firefox: ', isFirefox)
     var cont = document.getElementById("container");
