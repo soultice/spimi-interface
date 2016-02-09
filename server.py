@@ -47,12 +47,14 @@ def get_output(query, lower, ignchar):
         output = output.lower()
         query = query.lower()
     if ignchar != 'undefined':
-        output = re.sub('[^a-zA-Z0-9\n]', ' ', output)
+        output = re.sub('[^a-zA-Z0-9\n\.]', ' ', output)
         sentences = output.split('\n')
+        sentences = [sent for sent in sentences if query in sent]
     else:
         output = ' '.join(re.split(r'(\W)', output))
         output = re.sub(r' +', ' ', output)
         sentences = re.split('\n', output)
+        #output = [sent for sent in output if query in sent]
     return query, sentences
 
 
@@ -201,7 +203,8 @@ def return_cooc():
                 sent_before, sent_after = mark_sentence(qhit, word, sentence)
                 wic = (sent_before, query, sent_after)
                 if word not in words.keys():
-                    words[word] = set((wic))
+                    words[word] = set()
+                    words[word].add((wic))
                 elif wic not in words[word]:
                     words[word].add((wic))
     to_return = []

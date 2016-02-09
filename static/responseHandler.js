@@ -142,7 +142,7 @@
       }
       string = (strarray.join(" "));
     }
-    console.log("for word: ", mkword ,"\nshortened: ", strbuf, "\nto:", strarray.join(" "))
+    //console.log("for word: ", mkword ,"\nshortened: ", strbuf, "\nto:", strarray.join(" "))
     return string
   }
 
@@ -174,6 +174,7 @@
     console.log("charwidth",str.offsetWidth);
     var maxchars = Math.floor(cont.clientWidth * 0.39 / str.offsetWidth);
     console.log("maxchars:", maxchars);
+    strid.parentNode.removeChild(strid);
     return maxchars
   }
 
