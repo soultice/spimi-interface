@@ -58,18 +58,20 @@ def get_output(query, lower, ignchar):
     return query, sentences
 
 
-def mark_sentence(qpos, word, sentence):
-
+def mark_sentence(qpos, sentence):
     sent_before = ' '.join([w for w in sentence[:qpos]])
     sent_after = ' '.join([w for w in sentence[qpos+1:]])
-#    sent_before= ' '.join(['<span class=\"wmatch\">'
-#                         + word + '</span>'
-#                         if word == w else w for w in sentence[:qpos]])
-#    sent_after= ' '.join(['<span class=\"wmatch\">'
-#                         + word + '</span>'
-#                         if word == w else w for w in sentence[qpos+1:]])
     return sent_before, sent_after
 
+def short_sentence(query, sentence):
+    sentence = ' '.join(sentence)
+    maxchars = 58
+    qmatch = sentence.index(query)
+    qlen = len(query)
+    leftpart = sentence[max(0,qmatch-maxchars):qmatch]
+    rightpart = sentence[qmatch+qlen:
+                         min(qmatch+qlen+maxchars, len(sentence))]
+    return leftpart, rightpart
 
 
 @app.route('/spimi/api/get_freq_after', methods=['GET'])
@@ -103,7 +105,7 @@ def return_freq_after():
             if ahit < (len(sentence)):
                 after = sentence[ahit]
                 after_count.update([after])
-                sent_before, sent_after = mark_sentence(qhit, after, sentence)
+                sent_before, sent_after = mark_sentence(qhit, sentence)
                 wic = (sent_before, query, sent_after)
                 if after not in words.keys():
                     words[after] = set()
@@ -149,7 +151,7 @@ def return_freq_prev():
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
-                sent_before, sent_after = mark_sentence(qhit, prev, sentence)
+                sent_before, sent_after = mark_sentence(qhit, sentence)
                 wic = (sent_before, query, sent_after)
                 if prev not in words.keys():
                     words[prev] = set()
@@ -181,10 +183,8 @@ def return_cooc():
     query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     cont_count = Counter()
-    print (len(sentences))
     for sentence in sentences:
         if query in sentence:
-            sentlen = len(sentence)
             qhit = sentence.index(query)
             qlen = len(query)
             qpart = [sentence[qhit:qhit+qlen]]
@@ -195,7 +195,7 @@ def return_cooc():
             for word in sentence:
                 if word != query:
                     cont_count.update([word])
-                sent_before, sent_after = mark_sentence(qhit, word, sentence)
+                sent_before, sent_after = short_sentence(query, sentence)
                 wic = (sent_before, query, sent_after)
                 if word not in words.keys():
                     words[word] = set()
