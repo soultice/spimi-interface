@@ -91,3 +91,6 @@ div#loading {
     font-size: 8pt;
     font-family: "Bitstream Vera Sans Mono", monospace;
 }
+
+.dropdown-menu {
+ left: 230px}

@@ -41,6 +41,14 @@
                 <input type="checkbox" id="cbstrip" checked>
                     <span class="lbl"> Ignore punctuation characters</span>
             </a></li>
+            <li><a href="#"><span class="lbl" 
+                                  > Set char width </span> 
+            <div style="text-align:center;">
+            <input class="knob" id=contextknob data-thickness=".2"
+              data-width="120" data-min="0" data-max="255" data-displayPrevious=true
+              data-angleOffset=-125 data-angleArc=250 data-fgColor="#204d74"
+              value="255"> 
+            </div></a></li>
           </ul>
           <input id = "Search" name="q" type="text" class="form-control"
            placeholder="Search for a word">
@@ -55,9 +63,8 @@
                 <label class="btn btn-primary">
                   <input type="radio" name="option" id='cooc' > coocurrence
                 </label>
-             </div>
-      </div>
-    </div>
+                      </div>
+              </div>
   </form>
   <div id="loading"></div>
 </div>
@@ -65,6 +72,7 @@
 
 
 {% block scripts %}
+<script type"text/javascript" src="{{url_for('static', filename='jquery.knob.js')}}"></script>
 <script type"text/javascript" src="{{url_for('static', filename='responseHandler.js')}}"></script>
 <script type="text/javascript">// <![CDATA[
         function loading(){

@@ -65,7 +65,7 @@ def mark_sentence(qpos, sentence):
 
 def short_sentence(query, sentence):
     sentence = ' '.join(sentence)
-    maxchars = 58
+    maxchars = 1000
     qmatch = sentence.index(query)
     qlen = len(query)
     leftpart = sentence[max(0,qmatch-maxchars):qmatch]
@@ -180,6 +180,7 @@ def return_cooc():
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
     ignchar = request.args.get('strip', False)
+    charlen = int(request.args.get('charlen', 255))
     query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     cont_count = Counter()
@@ -188,15 +189,20 @@ def return_cooc():
             qhit = sentence.index(query)
             qlen = len(query)
             qpart = [sentence[qhit:qhit+qlen]]
-            prepart = sentence[:qhit].split()
-            aftpart = sentence[qhit+qlen:].split()
+            borderleft = max(0, qhit-charlen)
+            #while sentence[max(0,borderleft)] != " ":
+            #    borderleft += 1
+            borderright = min(qhit+qlen+charlen, len(sentence)-1)
+            #while sentence[min(len(sentence)-1,borderright)] != " ":
+            #    borderright -= 1
+            prepart = sentence[borderleft:qhit].split()
+            aftpart = sentence[qhit+qlen:borderright].split()
             sentence = prepart + qpart + aftpart
             qhit = sentence.index(query)
             for word in sentence:
                 if word != query:
                     cont_count.update([word])
-                sent_before, sent_after = short_sentence(query, sentence)
-                wic = (sent_before, query, sent_after)
+                wic = (' '.join(prepart), query, ' '.join(aftpart))
                 if word not in words.keys():
                     words[word] = set()
                     words[word].add((wic))

@@ -1,9 +1,12 @@
 (function() {
+  contextknob.value = calculate_max_td()
   // This is responsible for the http.get methods
     // it checks the current buttons pressed and starts the http.get 
     // to the correct address
   document.getElementById("Submit").onclick = function(event) { 
     event.preventDefault();
+    console.log(contextknob.value)
+    var charlen = contextknob.value
       var q = document.getElementById("Search").value;
       if (document.getElementById('cblower').checked){
         var cblower = 'True'}
@@ -12,7 +15,7 @@
 
       if (document.getElementById('after').checked) {
           makeRequest('/spimi/api/get_freq_after?q=' + q + '&strip=' + cbstrip
-                      + '&lower=' + cblower)
+                      + '&lower=' + cblower )
           }
       if (document.getElementById('prev').checked) {
           makeRequest('/spimi/api/get_freq_prev?q=' + q + '&strip=' + cbstrip
@@ -20,7 +23,7 @@
           }
       if (document.getElementById('cooc').checked) {
           makeRequest('/spimi/api/get_cooc?q=' + q + '&strip=' + cbstrip
-                      + '&lower=' + cblower)
+                      + '&lower=' + cblower + '&charlen=' + charlen)
           }
       return false;
   };
@@ -112,9 +115,6 @@
     // shortened so that there will be no 'swallowing' of the important words
     // caused by the text-overflow: hidden css property
     if (string != undefined ){
-      if (string.length > maxlen && document.getElementById("cooc").checked){
-        var string = shorten_string(maxlen, mkword, string);
-      }
       var strarray = string.split(" ");
       for (var i = 0; i < strarray.length; i++){
         if (strarray[i] === mkword){
