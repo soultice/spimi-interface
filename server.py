@@ -9,9 +9,8 @@ import re
 import argparse
 import time
 
-# TODO configuration via Make
+# TODO switch to HTTP POST from GET
 # TODO implement tree visualisation
-# TODO improve api by passing list of hits instead of html code
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -170,11 +169,11 @@ def return_cooc():
             qlen = len(query)
             qpart = [sentence[qhit:qhit+qlen]]
             borderleft = max(0, qhit-charlen)
-            #while sentence[max(0,borderleft)] != " ":
-            #    borderleft += 1
+            while sentence[max(0, borderleft)] != " ":
+                borderleft += 1
             borderright = min(qhit+qlen+charlen, len(sentence)-1)
-            #while sentence[min(len(sentence)-1,borderright)] != " ":
-            #    borderright -= 1
+            while sentence[min(len(sentence)-1, borderright)] != " ":
+                borderright -= 1
             prepart = sentence[borderleft:qhit].split()
             aftpart = sentence[qhit+qlen:borderright].split()
             sentence = prepart + qpart + aftpart
