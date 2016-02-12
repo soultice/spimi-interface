@@ -41,11 +41,11 @@
                 <input type="checkbox" id="cbstrip" checked>
                     <span class="lbl"> Ignore punctuation characters</span>
             </a></li>
-            <li><a href="#"><span class="lbl" 
+            <li><a href="#"><span class="lbl" style="text-align:center"
                                   > Set char width </span> 
             <div style="text-align:center;">
             <input class="knob" id=contextknob data-thickness=".2"
-              data-width="120" data-min="0" data-max="255" data-displayPrevious=true
+              data-width="120" data-min="1" data-max="255" data-displayPrevious=true
               data-angleOffset=-125 data-angleArc=250 data-fgColor="#204d74"
               value="255"> 
             </div></a></li>
@@ -55,7 +55,8 @@
               <button id='Submit' type="submit" class="btn btn-default">Submit</button>
               <div class="btn-group" data-toggle="buttons">
                 <label class="btn btn-primary active">
-                  <input type="radio" name="option" id='prev' checked> sort by previous
+                  <input type="radio" name="option" id='prev' checked>
+                  sort by previous
                 </label>
                 <label class="btn btn-primary">
                   <input type="radio" name="option" id='after' > sort by following
@@ -74,10 +75,4 @@
 {% block scripts %}
 <script type"text/javascript" src="{{url_for('static', filename='jquery.knob.js')}}"></script>
 <script type"text/javascript" src="{{url_for('static', filename='responseHandler.js')}}"></script>
-<script type="text/javascript">// <![CDATA[
-        function loading(){
-            $("#loading").show();
-            $("#content").hide();
-        }
-// ]]></script>
 {% endblock %}

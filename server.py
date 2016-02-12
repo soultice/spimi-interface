@@ -28,7 +28,7 @@ def rec_dd():
 
 def get_output(query, lower, ignchar):
     """Function to fetch and parse the output of spimi
-    
+
     :params:
     :query: the word to call spimi-retrieve with
     :lower: whether the returned text should be lowercased or not
@@ -54,59 +54,43 @@ def get_output(query, lower, ignchar):
         output = ' '.join(re.split(r'(\W)', output))
         output = re.sub(r' +', ' ', output)
         sentences = re.split('\n', output)
-        #output = [sent for sent in output if query in sent]
     return query, sentences
-
-
-def mark_sentence(qpos, sentence):
-    sent_before = ' '.join([w for w in sentence[:qpos]])
-    sent_after = ' '.join([w for w in sentence[qpos+1:]])
-    return sent_before, sent_after
-
-def short_sentence(query, sentence):
-    sentence = ' '.join(sentence)
-    maxchars = 1000
-    qmatch = sentence.index(query)
-    qlen = len(query)
-    leftpart = sentence[max(0,qmatch-maxchars):qmatch]
-    rightpart = sentence[qmatch+qlen:
-                         min(qmatch+qlen+maxchars, len(sentence))]
-    return leftpart, rightpart
 
 
 @app.route('/spimi/api/get_freq_after', methods=['GET'])
 def return_freq_after():
     """Return the 50 most frequent words succeding the query, their frequency,
-       and a random sample that contains an example containing the query,
-       it's left and right context where the query as well as the current
-       most word per line is highlighted
-       (marked with qmatch and colored with css)
+       and a random sample, containing the query as well as
+       it's left and right context.
 
        :returns: nested list of [dict(word, frequency, sent)]:
-       :rtype: json
+       :rtype: json string
     """
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
     ignchar = request.args.get('strip', False)
+    # getting output
     query, sentences = get_output(query, lowercase, ignchar)
     words = rec_dd()
     after_count = Counter()
     for sentence in sentences:
+        # double check since spimi bugged out a few times
         if query in sentence:
             qhit = sentence.index(query)
             qlen = len(query)
+            # determine parts of sentence and convert it to list
             qpart = [sentence[qhit:qhit+qlen]]
             prepart = sentence[:qhit].split()
             aftpart = sentence[qhit+qlen:].split()
             sentence = prepart + qpart + aftpart
             # Need to index again since we had to take care of multiword requests
+            # and the sentence was meanwhile converted to a list
             qhit = sentence.index(query)
             ahit = sentence.index(query)+1
             if ahit < (len(sentence)):
                 after = sentence[ahit]
                 after_count.update([after])
-                sent_before, sent_after = mark_sentence(qhit, sentence)
-                wic = (sent_before, query, sent_after)
+                wic = (' '.join(prepart), query, ' '.join(aftpart))
                 if after not in words.keys():
                     words[after] = set()
                     words[after].add((wic))
@@ -116,21 +100,19 @@ def return_freq_after():
     for word, count in after_count.most_common(50):
         sent = choice(list(words[word]))
         to_return.append({'word': word,
-                            'freq': count,
-                            'sent': sent})
+                          'freq': count,
+                          'sent': sent})
     return(json.dumps(to_return))
 
 
 @app.route('/spimi/api/get_freq_prev', methods=['GET'])
 def return_freq_prev():
     """Return the 50 most frequent words preceding the query, their frequency,
-       and a random sample that contains an example containing the query,
-       it's left and right context where the query as well as the
-       current word per line is highlighted
-       (marked with qmatch and colored with css)
+       and a random sample that contains an example containing the query as well
+       as it's left and right context
 
        :returns: nested list of [dict(word, frequency, sent)]:
-       :rtype: json
+       :rtype: json string
     """
     query = request.args.get('q', '')
     lowercase = request.args.get('lower', False)
@@ -151,8 +133,7 @@ def return_freq_prev():
                 prehit = sentence.index(query)-1
                 prev = sentence[prehit]
                 prev_count.update([prev])
-                sent_before, sent_after = mark_sentence(qhit, sentence)
-                wic = (sent_before, query, sent_after)
+                wic = (' '.join(prepart), query, ' '.join(aftpart))
                 if prev not in words.keys():
                     words[prev] = set()
                     words[prev].add((wic))
@@ -162,19 +143,18 @@ def return_freq_prev():
     for word, count in prev_count.most_common(50):
         sent = choice(list(words[word]))
         to_return.append({'word': word,
-                            'freq': count,
-                            'sent': sent})
+                          'freq': count,
+                          'sent': sent})
     return(json.dumps(to_return))
 
 @app.route('/spimi/api/get_cooc', methods=['GET', 'POST'])
 def return_cooc():
     """Returns the 50 most frequent words coocurring the query,
        their frequency as well as a random sample containing the query,
-       its left and right context, where the query as well as the coocurring
-       word is highlighted
+       its left and right context.
 
        :returns nested list of [dict(word, frequency, sent)]:
-       :rtype: json
+       :rtype: json string
        """
     starttime = time.clock()
     query = request.args.get('q', '')
@@ -212,18 +192,14 @@ def return_cooc():
     for word, count in cont_count.most_common(50):
         sent = choice(list(words[word]))
         to_return.append({'word': word,
-                        'freq': count,
-                        'sent': sent
-                        })
+                          'freq': count,
+                          'sent': sent
+                          })
 
     endtime = time.clock()
-    print("request complete, this took: " ,endtime - starttime, "seconds")
+    print("request complete, this took: ", endtime - starttime, "seconds")
     return(json.dumps(to_return))
 
-
-@app.route('/spimi/api/build_tree', methods=['GET'])
-def return_json():
-    pass
 
 @app.route('/spimi/interface')
 # Initial call to the interface

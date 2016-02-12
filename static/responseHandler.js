@@ -1,35 +1,37 @@
 (function() {
+  // Initlalising contextknob value to maximum char length
   contextknob.value = calculate_max_td()
   // This is responsible for the http.get methods
     // it checks the current buttons pressed and starts the http.get 
     // to the correct address
-  document.getElementById("Submit").onclick = function(event) { 
+  document.getElementById("Submit").onclick = function(event) {
     event.preventDefault();
-    console.log(contextknob.value)
     var charlen = contextknob.value
       var q = document.getElementById("Search").value;
       if (document.getElementById('cblower').checked){
-        var cblower = 'True'}
+        var cblower = 'True';}
       if (document.getElementById('cbstrip').checked){
-        var cbstrip = 'True'}
+        var cbstrip = 'True';}
 
       if (document.getElementById('after').checked) {
           makeRequest('/spimi/api/get_freq_after?q=' + q + '&strip=' + cbstrip
-                      + '&lower=' + cblower )
+                      + '&lower=' + cblower);
           }
       if (document.getElementById('prev').checked) {
           makeRequest('/spimi/api/get_freq_prev?q=' + q + '&strip=' + cbstrip
-                     + '&lower=' + cblower)
+                     + '&lower=' + cblower);
           }
       if (document.getElementById('cooc').checked) {
           makeRequest('/spimi/api/get_cooc?q=' + q + '&strip=' + cbstrip
-                      + '&lower=' + cblower + '&charlen=' + charlen)
+                      + '&lower=' + cblower + '&charlen=' + charlen);
           }
       return false;
   };
 
   function makeRequest(url) {
     // This function starts the request
+    // also shows the loading gif and hides the current table
+    // it will be newly shown when the request finishes
     httpRequest = new XMLHttpRequest();
     $("#loading").show();
     $(".freq_table").hide()
@@ -61,17 +63,18 @@
 
   function createTable(list) {
       // dynamically creates the table with its contents
-    var max_chars = calculate_max_td()
     var cont = document.getElementById("container");
     var tb1 = document.createElement("table");
     var prevtable = document.getElementsByClassName("freq_table")[0]
     tb1.setAttribute("class", "freq_table")
+    // table Header
     var thead = document.createElement("thead")
     var titles = ['freq', 'word', 'left context', 'query', 'right context'];
     for (var i = 0; i< titles.length; i++){
         thead.appendChild(document.createElement("th")).
         appendChild(document.createTextNode(titles[i]))
         }
+    // table content
     tb1.appendChild(thead)
     for (var  i = 0; i < list.length; i++){
         var tr = document.createElement('tr');
@@ -88,12 +91,9 @@
         var text1 = document.createTextNode(list[i]['freq']);
         td1.appendChild(text1);
         td2.innerHTML = (list[i]['word'])
-        td3.innerHTML = format_string(max_chars, list[i]['word'], list[i]['sent'][0])
+        td3.innerHTML = format_string(list[i]['word'], list[i]['sent'][0])
         td4.innerHTML = (list[i]['sent'][1])
-        td5.innerHTML = format_string(max_chars, list[i]['word'], list[i]['sent'][2])
-        //for (var i = 1; i <= 5; i++){
-        //    var child = document.getElementById("td" + i)
-        //    tr.appendChild(child)}
+        td5.innerHTML = format_string(list[i]['word'], list[i]['sent'][2])
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
@@ -102,31 +102,29 @@
         tr.appendChild(td5);
         tb1.appendChild(tr);
         }
+    // remove previous table if it exists
     if (prevtable != null){
         prevtable.parentNode.removeChild(prevtable);
-        shorten_string(max_chars, 'the','testing the sentence length if i change the sentence here and there and the meaning and so on')
        }
     cont.appendChild(tb1)
     }
 
-  function format_string(maxlen, mkword, string) {
+  function format_string(mkword, string) {
     // highlighting the words that are in the word column in their example
-    // sentences, as well as checking if the string is too long and needs to be 
-    // shortened so that there will be no 'swallowing' of the important words
-    // caused by the text-overflow: hidden css property
+    // sentences. coloring happens in css via the wmatch class.
     if (string != undefined ){
       var strarray = string.split(" ");
       for (var i = 0; i < strarray.length; i++){
         if (strarray[i] === mkword){
           strarray[i] = '<span class=\"wmatch\">' + strarray[i] + '</span>';
           }
-          //console.log('length', strarray.join(" ").length)
       }
     return strarray.join(" ")
     }
   }
 
   function shorten_string(maxlen, mkword, string){
+    // Currently not in use -- needs further review
     // replacing words in our sentence with '.' while the sentence is longer 
     // than maxlen and the word is not equal to our marked word
     var strbuf = string
@@ -144,20 +142,6 @@
     }
     //console.log("for word: ", mkword ,"\nshortened: ", strbuf, "\nto:", strarray.join(" "))
     return string
-  }
-
-  function join_points(strarray){
-    // concatenate multiple points in a string to a single point
-  var concstring = new String();
-  for (var i = 0; i < strarray.length; i++){
-    if (strarray[i] === "." && strarray[i-1] !=="."){
-      concstring = concstring.concat(" " + strarray[i])
-      }
-    else if (strarray[i] != "."){
-      concstring = concstring.concat(" " + strarray[i])
-      }
-    }
-    return concstring
   }
 
   function calculate_max_td(){
